@@ -2,11 +2,24 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
 
-  const isPublicPath =
-    path === "/auth/login" || path === "/api/login" || path === "/api/register";
-  const isApiRoute = path.startsWith("/api");
+  // Daftar rute publik
+  const publicPaths = [
+    "/auth/login",
+    "/api/login",
+    "/api/register",
+    "/oauth/sso/authorize",
+  ];
+  const isPublicPath = publicPaths.includes(pathname);
+  // Pengecualian untuk file statis dan aset Next.js
+  const isStaticFile =
+    pathname.startsWith("/_next") || pathname.startsWith("/static");
+
+  // Abaikan middleware untuk file statis
+  if (isStaticFile) {
+    return NextResponse.next();
+  }
 
   const token = request.cookies.get("token")?.value || "";
   const authHeader = request.headers.get("Authorization") || "";
@@ -15,7 +28,7 @@ export function middleware(request: NextRequest) {
     : null;
 
   // Handle API routes
-  if (isApiRoute) {
+  if (pathname.startsWith("/api")) {
     // Allow public API routes without Bearer token
     if (isPublicPath) {
       return NextResponse.next();
@@ -25,7 +38,6 @@ export function middleware(request: NextRequest) {
     if (!bearerToken) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    // You could add further validation for the Bearer token here if needed
     return NextResponse.next();
   }
 
@@ -40,12 +52,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/",
-    "/profile",
-    "/auth/login",
-    "/signup",
-    "/verifyemail",
-    "/api/:path*",
-  ],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };

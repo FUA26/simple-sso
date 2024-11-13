@@ -18,8 +18,9 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
+// import Link from "next/link";
 import { LoginSchema } from "@/schemas/auth";
+import { loginAction } from "@/actions/auth.action";
 
 export const AuthorizeForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -38,27 +39,33 @@ export const AuthorizeForm = () => {
     setError("");
     setSuccess("");
 
-    startTransition(async () => {
-      try {
-        const response = await fetch("/api/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        });
+    // startTransition(async () => {
+    //   try {
+    //     const response = await fetch("/api/login", {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify(values),
+    //     });
 
-        const data = await response.json();
+    //     const data = await response.json();
 
-        if (!response.ok) {
-          setError(data.message || "Login failed.");
-        } else {
-          setSuccess("Login successful.");
-          // You can handle success like redirecting to dashboard or saving tokens
-        }
-      } catch (err) {
-        setError("An unexpected error occurred.");
-      }
+    //     if (!response.ok) {
+    //       setError(data.message || "Login failed.");
+    //     } else {
+    //       setSuccess("Login successful.");
+    //       // You can handle success like redirecting to dashboard or saving tokens
+    //     }
+    //   } catch (err) {
+    //     setError("An unexpected error occurred.");
+    //   }
+    // });
+    startTransition(() => {
+      loginAction(values).then((data) => {
+        // console.log("on form",values)
+        setError(data?.error);
+      });
     });
   };
 

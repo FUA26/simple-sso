@@ -12,7 +12,6 @@ export function middleware(request: NextRequest) {
     "/oauth/sso/authorize",
   ];
   const isPublicPath = publicPaths.includes(pathname);
-
   // Pengecualian untuk file statis dan aset Next.js
   const isStaticFile =
     pathname.startsWith("/_next") || pathname.startsWith("/static");
@@ -41,7 +40,7 @@ export function middleware(request: NextRequest) {
     }
     return NextResponse.next();
   }
-
+  // console.log("HIIIITTT", isPublicPath, token);
   // Handle non-API routes with cookie-based authentication
   if (isPublicPath && token) {
     return NextResponse.redirect(new URL("/", request.nextUrl));
@@ -52,4 +51,6 @@ export function middleware(request: NextRequest) {
   }
 }
 
-export const config = {};
+export const config = {
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+};

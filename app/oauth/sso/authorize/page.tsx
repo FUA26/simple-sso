@@ -3,8 +3,14 @@
 import { AuthorizeForm } from "@/components/forms/authorize-form";
 import Image from "@/components/ui/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function Login() {
+  const searchParams = useSearchParams();
+
+  const name = searchParams.get("name");
+  // const url = searchParams.get("redirect_uri");
+
   return (
     <>
       <div className="grid gap-2 text-center">
@@ -22,7 +28,8 @@ export default function Login() {
         </div>
         <h1 className="text-3xl font-bold">Login</h1>
         <p className="text-muted-foreground">
-          Enter your email below to login to your account
+          Anda harus login terlebih dahulu untuk mengakses halaman{" "}
+          <span className="font-bold text-primary">{name}</span>.
         </p>
       </div>
       <div className="grid gap-4">
